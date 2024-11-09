@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Tecar_Bianca_Lab2.Data;
 using Tecar_Bianca_Lab2.Models;
+using Tecar_Bianca_Lab2.Models.ViewModels;
 
 namespace Tecar_Bianca_Lab2.Pages.Publishers
 {
@@ -19,11 +20,32 @@ namespace Tecar_Bianca_Lab2.Pages.Publishers
             _context = context;
         }
 
-        public IList<Publisher> Publisher { get;set; } = default!;
+        public IList<Publisher> Publisher { get; set; } = default!;
+        public PublisherIndexData PublisherData { get; set; }
+        public int PublisherID { get; set; }
+        public int BookID { get; set; }
 
-        public async Task OnGetAsync()
+        // This method handles both the Publisher and Book data retrieval
+        public async Task OnGetAsync(int? id, int? bookID)
         {
-            Publisher = await _context.Publisher.ToListAsync();
+            PublisherData = new PublisherIndexData();
+
+            // Fetch the list of publishers, including related books, ordered by PublisherName
+            PublisherData.Publishers = await _context.Publisher
+                .Include(i => i.Books)
+                .OrderBy(i => i.PublisherName)
+                .ToListAsync();
+
+            // If an ID is provided, filter the selected publisher and load the related books
+            if (id != null)
+            {
+                PublisherID = id.Value;
+                Publisher publisher = PublisherData.Publishers
+                    .Where(i => i.ID == id.Value)
+                    .Single();
+
+                PublisherData.Books = publisher.Books;
+            }
         }
     }
 }

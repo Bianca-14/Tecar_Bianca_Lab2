@@ -21,7 +21,12 @@ namespace Tecar_Bianca_Lab2.Pages.Books
 
         public IList<Book> Book { get; set; } = default!;
 
-        public async Task OnGetAsync()
+
+
+        public string TitleSort { get; set; }
+        public string AuthorSort { get; set; }
+
+        public async Task OnGetAsync(string sortOrder)
         {
             // Include the Publisher information when fetching Books
             Book = await _context.Book

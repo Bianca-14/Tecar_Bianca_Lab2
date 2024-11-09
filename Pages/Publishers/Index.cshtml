@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{id:int?}"
 @model Tecar_Bianca_Lab2.Pages.Publishers.IndexModel
 
 @{
@@ -10,27 +10,78 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Publisher[0].PublisherName)
+                @if (Model.PublisherData.Publishers.Any())
+                {
+        @Html.DisplayNameFor(model => model.PublisherData.Publishers.FirstOrDefault().PublisherName)
+                }
+                else
+                {
+                    <span>No Data</span>
+                }
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Publisher) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.PublisherName)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.PublisherData.Publishers)
+        {
+            string selectedRow = "";
+            if (item.ID == Model.PublisherID)
+            {
+                selectedRow = "table-success";
+            }
+
+            <tr class="@selectedRow">
+                <td>
+                    @Html.DisplayFor(modelItem => item.PublisherName)
+                </td>
+                <td>
+                    <a asp-page="./Index" asp-route-id="@item.ID">Select</a> |
+                    <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
+                    <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@if (Model.PublisherData.Books != null && Model.PublisherID > 0)
+{
+    <h3>Books Edited by Selected Publisher</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Book Title</th>
+                <th>Author</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PublisherData.Publishers)
+            {
+                // Check if the current publisher matches the selected publisher
+                string selectedRow = "";
+                if (item.ID == Model.PublisherID)
+                {
+                    selectedRow = "table-success";
+                }
+
+                <tr class="@selectedRow">
+                    <td>
+                        @foreach (var b in item.Books)
+                        {
+                            <div>
+                                <strong>@b.Title</strong> - @b.Author
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
